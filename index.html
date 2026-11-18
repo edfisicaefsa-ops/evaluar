@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Calculadora oficial de calificaciones de Educación Física EFSA" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Educación Física EFSA</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-border: #334155;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #38bdf8;
+      --gold: #facc15;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #22c55e;
+      --warning: #eab308;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    header {
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+    header .badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+    }
+    .label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .gender-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .gender-btn {
+      background: #0f172a;
+      border: 2px solid var(--card-border);
+      color: var(--muted);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .gender-btn.active {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    select, input {
+      width: 100%;
+      background: #0f172a;
+      border: 2px solid var(--card-border);
+      color: #fff;
+      padding: 13px 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.15s ease;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent);
+    }
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: -10px;
+      margin-bottom: 16px;
+    }
+    .result-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+    }
+    .result-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .grade {
+      font-size: 3.4rem;
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--muted);
+    }
+    .grade.high { color: var(--success); }
+    .grade.mid { color: var(--warning); }
+    .grade.low { color: var(--danger); }
+    .status-text {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+    details {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 16px;
+    }
+    summary {
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      color: var(--accent);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.88rem;
+    }
+    th, td {
+      padding: 8px 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+    tr.highlight {
+      background: rgba(56, 189, 248, 0.22);
+      font-weight: 800;
+      color: #fff;
+    }
+    #installBtn {
+      display: none;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="badge">Tabulación Oficial</span>
+      <h1>Educación Física EFSA</h1>
+    </header>
+
+    <button id="installBtn">📲 Instalar App en Android</button>
+
+    <div class="card">
+      <label class="label">Género</label>
+      <div class="gender-grid">
+        <button type="button" class="gender-btn active" data-gender="masculino">Masculino</button>
+        <button type="button" class="gender-btn" data-gender="femenino">Femenino</button>
+      </div>
+
+      <label class="label" for="testSelect">Prueba Física</label>
+      <select id="testSelect">
+        <option value="abdominales">Abdominales</option>
+        <option value="flexiones">Flexoextensiones de brazos</option>
+        <option value="1125">1125 mts.</option>
+        <option value="circuito">Circuito</option>
+      </select>
+
+      <label class="label" for="valueInput" id="inputLabel">Cantidad realizada</label>
+      <input type="text" id="valueInput" placeholder="Ej: 45" autocomplete="off" inputmode="numeric" />
+      <p class="hint" id="inputHint">Ingrese repeticiones enteras. Menos del mínimo = 0.</p>
+
+      <div class="result-box">
+        <div class="result-title">Calificación</div>
+        <div class="grade" id="gradeDisplay">-</div>
+        <div class="status-text" id="statusDisplay">Ingrese un valor para evaluar</div>
+      </div>
+    </div>
+
+    <details open>
+      <summary>
+        <span id="tableTitle">Ver tabla: Abdominales (Masculino)</span>
+        <span>▼</span>
+      </summary>
+      <table>
+        <thead>
+          <tr>
+            <th id="colHeader">Cantidades</th>
+            <th>Nota</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </details>
+  </div>
+
+  <script>
+    // Tablas extraídas exactamente de las planillas oficiales
+    const RUBRICS = {
+      abdominales: {
+        type: 'reps',
+        label: 'Abdominales',
+        masculino: [
+          { min: 61, max: Infinity, grade: 10, text: '61 o más' },
+          { min: 56, max: 60, grade: 9, text: '56 - 60' },
+          { min: 51, max: 55, grade: 8, text: '51 - 55' },
+          { min: 46, max: 50, grade: 7, text: '46 - 50' },
+          { min: 41, max: 45, grade: 6, text: '41 - 45' },
+          { min: 36, max: 40, grade: 5, text: '36 - 40' },
+          { min: 31, max: 35, grade: 4, text: '31 - 35' },
+          { min: 26, max: 30, grade: 3, text: '26 - 30' },
+          { min: 21, max: 25, grade: 2, text: '21 - 25' },
+          { min: 16, max: 20, grade: 1, text: '16 - 20' }
+        ],
+        femenino: [
+          { min: 53, max: Infinity, grade: 10, text: '53 o más' },
+          { min: 48, max: 52, grade: 9, text: '48 - 52' },
+          { min: 43, max: 47, grade: 8, text: '43 - 47' },
+          { min: 38, max: 42, grade: 7, text: '38 - 42' },
+          { min: 33, max: 37, grade: 6, text: '33 - 37' },
+          { min: 28, max: 32, grade: 5, text: '28 - 32' },
+          { min: 23, max: 27, grade: 4, text: '23 - 27' },
+          { min: 18, max: 22, grade: 3, text: '18 - 22' },
+          { min: 13, max: 17, grade: 2, text: '13 - 17' },
+          { min: 8, max: 12, grade: 1, text: '8 - 12' }
+        ]
+      },
+      flexiones: {
+        type: 'reps',
+        label: 'Flexoextensiones de brazos',
+        masculino: [
+          { min: 60, max: Infinity, grade: 10, text: '60 o más' },
+          { min: 55, max: 59, grade: 9, text: '55 - 59' },
+          { min: 50, max: 54, grade: 8, text: '50 - 54' },
+          { min: 43, max: 49, grade: 7, text: '43 - 49' },
+          { min: 35, max: 42, grade: 6, text: '35 - 42' },
+          { min: 30, max: 34, grade: 5, text: '30 - 34' },
+          { min: 25, max: 29, grade: 4, text: '25 - 29' },
+          { min: 20, max: 24, grade: 3, text: '20 - 24' },
+          { min: 15, max: 19, grade: 2, text: '15 - 19' },
+          { min: 10, max: 14, grade: 1, text: '10 - 14' }
+        ],
+        femenino: [
+          { min: 50, max: Infinity, grade: 10, text: '50 o más' },
+          { min: 45, max: 49, grade: 9, text: '45 - 49' },
+          { min: 40, max: 44, grade: 8, text: '40 - 44' },
+          { min: 33, max: 39, grade: 7, text: '33 - 39' },
+          { min: 25, max: 32, grade: 6, text: '25 - 32' },
+          { min: 20, max: 24, grade: 5, text: '20 - 24' },
+          { min: 15, max: 19, grade: 4, text: '15 - 19' },
+          { min: 10, max: 14, grade: 3, text: '10 - 14' },
+          { min: 5, max: 9, grade: 2, text: '5 - 9' },
+          { min: 2, max: 4, grade: 1, text: '2 - 4' }
+        ]
+      },
+      '1125': {
+        type: 'time',
+        label: '1125 mts.',
+        masculino: [
+          { min: 0, max: 220, grade: 10, text: 'Hasta 3:40' },
+          { min: 221, max: 235, grade: 9, text: '3:41 - 3:55' },
+          { min: 236, max: 250, grade: 8, text: '3:56 - 4:10' },
+          { min: 251, max: 265, grade: 7, text: '4:11 - 4:25' },
+          { min: 266, max: 280, grade: 6, text: '4:26 - 4:40' },
+          { min: 281, max: 295, grade: 5, text: '4:41 - 4:55' },
+          { min: 296, max: 310, grade: 4, text: '4:56 - 5:10' },
+          { min: 311, max: 325, grade: 3, text: '5:11 - 5:25' },
+          { min: 326, max: 340, grade: 2, text: '5:26 - 5:40' },
+          { min: 341, max: 355, grade: 1, text: '5:41 - 5:55' }
+        ],
+        femenino: [
+          { min: 0, max: 270, grade: 10, text: 'Hasta 4:30' },
+          { min: 271, max: 285, grade: 9, text: '4:31 - 4:45' },
+          { min: 286, max: 300, grade: 8, text: '4:46 - 5:00' },
+          { min: 301, max: 320, grade: 7, text: '5:01 - 5:20' },
+          { min: 321, max: 340, grade: 6, text: '5:21 - 5:40' },
+          { min: 341, max: 360, grade: 5, text: '5:41 - 6:00' },
+          { min: 361, max: 375, grade: 4, text: '6:01 - 6:15' },
+          { min: 376, max: 390, grade: 3, text: '6:16 - 6:30' },
+          { min: 391, max: 405, grade: 2, text: '6:31 - 6:45' },
+          { min: 406, max: 420, grade: 1, text: '6:46 - 7:00' }
+        ]
+      },
+      circuito: {
+        type: 'time',
+        label: 'Circuito',
+        masculino: [
+          { min: 0, max: 50, grade: 10, text: 'Hasta 0:50' },
+          { min: 51, max: 55, grade: 9, text: '0:51 - 0:55' },
+          { min: 56, max: 60, grade: 8, text: '0:56 - 1:00' },
+          { min: 61, max: 65, grade: 7, text: '1:01 - 1:05' },
+          { min: 66, max: 70, grade: 6, text: '1:06 - 1:10' },
+          { min: 71, max: 75, grade: 5, text: '1:11 - 1:15' },
+          { min: 76, max: 80, grade: 4, text: '1:16 - 1:20' },
+          { min: 81, max: 85, grade: 3, text: '1:21 - 1:25' },
+          { min: 86, max: 90, grade: 2, text: '1:26 - 1:30' },
+          { min: 91, max: 95, grade: 1, text: '1:31 - 1:35' }
+        ],
+        femenino: [
+          { min: 0, max: 65, grade: 10, text: 'Hasta 1:05' },
+          { min: 66, max: 70, grade: 9, text: '1:06 - 1:10' },
+          { min: 71, max: 75, grade: 8, text: '1:11 - 1:15' },
+          { min: 76, max: 80, grade: 7, text: '1:16 - 1:20' },
+          { min: 81, max: 85, grade: 6, text: '1:21 - 1:25' },
+          { min: 86, max: 90, grade: 5, text: '1:26 - 1:30' },
+          { min: 91, max: 95, grade: 4, text: '1:31 - 1:35' },
+          { min: 96, max: 100, grade: 3, text: '1:36 - 1:40' },
+          { min: 101, max: 105, grade: 2, text: '1:41 - 1:45' },
+          { min: 106, max: 110, grade: 1, text: '1:46 - 1:50' }
+        ]
+      }
+    };
+
+    let currentGender = 'masculino';
+    const genderBtns = document.querySelectorAll('.gender-btn');
+    const testSelect = document.getElementById('testSelect');
+    const valueInput = document.getElementById('valueInput');
+    const inputLabel = document.getElementById('inputLabel');
+    const inputHint = document.getElementById('inputHint');
+    const gradeDisplay = document.getElementById('gradeDisplay');
+    const statusDisplay = document.getElementById('statusDisplay');
+    const tableTitle = document.getElementById('tableTitle');
+    const colHeader = document.getElementById('colHeader');
+    const tableBody = document.getElementById('tableBody');
+
+    function parseTimeToSeconds(raw) {
+      const clean = raw.trim().replace(',', '.');
+      if (!clean) return null;
+      if (clean.includes(':') || clean.includes('.')) {
+        const sep = clean.includes(':') ? ':' : '.';
+        const parts = clean.split(sep);
+        if (parts.length !== 2) return null;
+        const mins = parseInt(parts[0], 10);
+        const secs = parseInt(parts[1], 10);
+        if (isNaN(mins) || isNaN(secs) || mins < 0 || secs < 0 || secs >= 60) return null;
+        return mins * 60 + secs;
+      }
+      const num = Number(clean);
+      if (isNaN(num) || num < 0) return null;
+      return Math.round(num);
+    }
+
+    function updateInputUI() {
+      const test = RUBRICS[testSelect.value];
+      if (test.type === 'reps') {
+        inputLabel.textContent = 'Cantidad realizada';
+        valueInput.placeholder = 'Ej: 45';
+        valueInput.setAttribute('inputmode', 'numeric');
+        inputHint.textContent = 'Ingrese repeticiones enteras. Menos del mínimo de nota 1 = 0.';
+      } else {
+        inputLabel.textContent = 'Tiempo registrado (M:SS o segundos)';
+        valueInput.placeholder = testSelect.value === '1125' ? 'Ej: 4:15' : 'Ej: 1:02';
+        valueInput.setAttribute('inputmode', 'text');
+        inputHint.textContent = 'Formato M:SS (ej. 3:50) o segundos totales. Si excede nota 1 = 0.';
+      }
+    }
+
+    function evaluate() {
+      const testKey = testSelect.value;
+      const test = RUBRICS[testKey];
+      const rows = test[currentGender];
+      const raw = valueInput.value.trim();
+
+      let matchedGrade = null;
+      let statusMsg = 'Ingrese un valor para evaluar';
+
+      if (raw !== '') {
+        if (test.type === 'reps') {
+          const reps = Number(raw);
+          if (!Number.isInteger(reps) || reps < 0) {
+            statusMsg = 'Ingrese un número entero válido';
+          } else {
+            const minRequired = rows[rows.length - 1].min;
+            if (reps < minRequired) {
+              matchedGrade = 0;
+              statusMsg = `Debajo del mínimo (${minRequired}) → Nota 0`;
+            } else {
+              for (const r of rows) {
+                if (reps >= r.min && reps <= r.max) {
+                  matchedGrade = r.grade;
+                  statusMsg = matchedGrade >= 6 ? 'Aprobado' : 'Desaprobado';
+                  break;
+                }
+              }
+            }
+          }
+        } else {
+          const secs = parseTimeToSeconds(raw);
+          if (secs === null) {
+            statusMsg = 'Formato inválido. Use M:SS (ej: 4:10)';
+          } else {
+            const maxAllowed = rows[rows.length - 1].max;
+            if (secs > maxAllowed) {
+              matchedGrade = 0;
+              statusMsg = `Tiempo excedido (${rows[rows.length - 1].text.split(' - ')[1]}) → Nota 0`;
+            } else {
+              for (const r of rows) {
+                if (secs >= r.min && secs <= r.max) {
+                  matchedGrade = r.grade;
+                  statusMsg = matchedGrade >= 6 ? 'Aprobado' : 'Desaprobado';
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      gradeDisplay.className = 'grade';
+      if (matchedGrade === null) {
+        gradeDisplay.textContent = '-';
+      } else {
+        gradeDisplay.textContent = matchedGrade;
+        if (matchedGrade >= 6) gradeDisplay.classList.add('high');
+        else if (matchedGrade >= 4) gradeDisplay.classList.add('mid');
+        else gradeDisplay.classList.add('low');
+      }
+      statusDisplay.textContent = statusMsg;
+
+      renderTable(matchedGrade);
+    }
+
+    function renderTable(activeGrade) {
+      const test = RUBRICS[testSelect.value];
+      const rows = test[currentGender];
+      const genderLabel = currentGender === 'masculino' ? 'Masculino' : 'Femenino';
+
+      tableTitle.textContent = `Ver tabla: ${test.label} (${genderLabel})`;
+      colHeader.textContent = test.type === 'reps' ? 'Cantidades' : 'Tiempo';
+
+      tableBody.innerHTML = rows.map(r => `
+        <tr class="${r.grade === activeGrade ? 'highlight' : ''}">
+          <td>${r.text}</td>
+          <td>${r.grade}</td>
+        </tr>
+      `).join('');
+    }
+
+    genderBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        genderBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentGender = btn.dataset.gender;
+        evaluate();
+      });
+    });
+
+    testSelect.addEventListener('change', () => {
+      valueInput.value = '';
+      updateInputUI();
+      evaluate();
+    });
+
+    valueInput.addEventListener('input', evaluate);
+
+    updateInputUI();
+    evaluate();
+
+    // Registro del Service Worker para instalación en Android
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // Botón de instalación directa si el navegador dispara beforeinstallprompt
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
